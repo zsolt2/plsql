@@ -10,7 +10,7 @@ BEGIN
     utl_file.put_line(outfile,'<html>');
     utl_file.put_line(outfile, '<head><meta charset="UTF-8"></head>');
     utl_file.put_line(outfile,'<body>');
-    utl_file.put_line(outfile,'<H1>Öszegzés</H1>');
+    utl_file.put_line(outfile,'<H1>Eredmény lap</H1>');
     FOR p IN productnames LOOP
         --Termék adatai
         utl_file.put_line(outfile, '<H2>'||p.name||'</H2>');
