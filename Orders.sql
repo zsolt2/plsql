@@ -1,3 +1,4 @@
+--Orders tábla létrehozása
 CREATE TABLE orders (	
     oid NUMBER,
 	pid NUMBER NOT NULL, 
@@ -9,30 +10,40 @@ CREATE TABLE orders (
     REFERENCES product(pid)
 )
 
+--Új megrendelés létrehozása
 CREATE OR REPLACE PROCEDURE neworders( inproductname IN VARCHAR2, inquantity IN NUMBER, indate IN DATE) AS
     n_oid NUMBER;
     n_pid NUMBER;
     n_stock NUMBER;
 BEGIN
+    --A termék azonosítójának lekérdezése, ha nincs ilyen azonosító, no_data_found kivételt kapunk.
     SELECT pid INTO n_pid FROM product WHERE  lower(product.name) = lower(inproductname);
-    IF inquantity < 0 THEN
-        dbms_output.put_line('A rendelés tétele nem lehet 0-nál kissebb!');
+    --Értékek ellenõrzése
+    IF inquantity <= 0 THEN
+        dbms_output.put_line('A rendelés tétele nem lehet 0, vagy annál kissebb!');
     ELSE 
         SELECT pid, stock INTO n_pid, n_stock FROM product WHERE product.pid = n_pid;
+        
+        --Egyéni elsõdleges kulcs generálása
         SELECT MAX(oid) INTO n_oid FROM orders;
         IF n_oid IS NULL THEN
             n_oid := 0;
         END IF;
         n_oid := n_oid + 1;
+        
+        --Ha nincs elég termék raktáron a rendelés sikertelen
         IF n_stock - inquantity < 0 THEN
-          dbms_output.put_line('Nincs elég termék a raktáron!');
+          dbms_output.put_line('Nincs elég termék raktáron!');
         ELSE
+            --Rendelés beszúrása az Orders táblába
             INSERT INTO orders VALUES(n_oid, n_pid, inquantity, indate );
+            --A termék raktárkészletének frissítése a Product táblában
             UPDATE product SET product.stock = product.stock - inquantity WHERE pid=n_pid;
             dbms_output.put_line('Rendelés kész!');
         END IF;
     END IF;
 EXCEPTION
+    --no_data_found kivétel kezelése
     WHEN no_data_found THEN
         dbms_output.put_line('Nincs ilyen Termek');
 END neworders;
@@ -43,7 +54,6 @@ DECLARE
     quantity NUMBER;
     day NUMBER(2);
     numoforders NUMBER;
-    month NUMBER;
     daystr VARCHAR2(10);
 BEGIN
     FOR productname IN productnames LOOP
