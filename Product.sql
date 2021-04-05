@@ -78,11 +78,11 @@ SET SERVEROUTPUT ON;
 
 --Termékek létrehozása
 BEGIN
-    newproduct('Alma',5000,20);
-    newproduct('Körte',7000,10);
-    newproduct('Szilva',15000,30);
-    newproduct('Répa',5090,45);
-    newproduct('Karalábé',8500,33);
-    newproduct('Paprika',7000,26);
-    newproduct('Paradicsom',3000,11);
+    newproduct('Féktárcsa',5000,20000);
+    newproduct('Olajszûrõ',7000,5000);
+    newproduct('Gyújtótekercs',15000,3500);
+    newproduct('Nyárigumi',5090,45000);
+    newproduct('Téligumi',8500,33000);
+    newproduct('Gyújtógyertya',7000,2600);
+    newproduct('Levegõszûrõ',3000,2100);
 END;

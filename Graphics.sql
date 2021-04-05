@@ -8,6 +8,7 @@ BEGIN
     outfile := utl_file.fopen('OTPUTDIR', 'results.html' , 'W');
     
     utl_file.put_line(outfile,'<html>');
+    utl_file.put_line(outfile, '<head><meta charset="UTF-8"></head>');
     utl_file.put_line(outfile,'<body>');
     utl_file.put_line(outfile,'<H1>Öszegzés</H1>');
     FOR p IN productnames LOOP
@@ -16,7 +17,7 @@ BEGIN
         utl_file.put_line(outfile,'<div>');
         utl_file.put_line(outfile, 'Raktáron: '||p.stock);
         utl_file.put_line(outfile,'<br>');
-        utl_file.put_line(outfile, 'Ár: '||p.price);
+        utl_file.put_line(outfile, 'Ár: '||p.price||' HUF');
         utl_file.put_line(outfile,'<br>');
         utl_file.put_line(outfile, 'Vonalkód: '||p.barcode);
         utl_file.put_line(outfile,'<br>');
