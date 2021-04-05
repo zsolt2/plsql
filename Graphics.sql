@@ -57,8 +57,9 @@ BEGIN
     --Legkisebb és legnagyobb rendelések számának lekérdezése
     SELECT MAX(SUM(orders.quantity)), MIN(SUM(orders.quantity)) INTO n_maxorders, n_minorders FROM  orders JOIN product ON orders.pid=product.pid WHERE product.name=inproductname GROUP BY orders.odate;
     
-    n_minorders := round(n_minorders - n_minorders * 0.1); --A szélsõértékek 10 százalékkal eltérnek, hogy ne 0-nál kezdõdjönek az oszlopok, és ne érjenek az ábra tetejéhez
-    n_maxorders := round(n_maxorders + n_maxorders * 0.1);
+    n_minorders := round(n_minorders - n_minorders * 0.2); --A szélsõértékek 10 százalékkal eltérnek, hogy ne 0-nál kezdõdjönek az oszlopok, és ne érjenek az ábra tetejéhez
+    n_maxorders := round(n_maxorders + n_maxorders * 0.2);
+    --A legnagyobb dátum számértéke
     n_maxdate := (d_maxdate - d_mindate);
     
     utl_file.put_line(outfile, '<svg height="'||(n_height)||'" width="'||n_width||' margin">');
@@ -67,11 +68,17 @@ BEGIN
     
     --Diagram oszlopainak rajzolása
     FOR a IN c_orders LOOP
+        --Jelenlegi dátum meghatározása szám formátumba
         n_currdate := (a.odate - d_mindate);
-        n_barheight := floor(map(  n_minorders, n_maxorders, 10 ,  n_chartheight -10, a.sumq ));
+        --Oszlop magassága
+        n_barheight := floor(map(  n_minorders, n_maxorders, 0 ,  n_chartheight, a.sumq ));
+        --Az oszlop X kordinátája
         n_barx := round(map(0, n_maxdate,  45 , n_width-10, n_currdate));
+        --Oszlop megrajzolása
         drawrect(n_barx, n_chartheight - n_barheight, n_barwidth, n_barheight, outfile);
+        --Az oszlop feletti szöveg(napi rendelések mennyisége)
         writetext(n_barx ,n_chartheight - n_barheight - 10, a.sumq, outfile );
+        --Az oszlop alatti szöveg( rendelés dátuma )
         writedate(n_barx, n_chartheight + 15, a.odate, outfile);
     END LOOP;
     --SVG tag lezárása
@@ -82,7 +89,7 @@ END makechart;
 CREATE OR REPLACE PROCEDURE drawchartLines(inmin IN NUMBER, inmax IN NUMBER,inwidth in number, inheight in Number, outfile IN utl_file.file_type ) AS
     n_height NUMBER := inheight;
     n_width NUMBER := inwidth;
-    n_min NUMBER := inmin - inmin*0.1;
+    n_min NUMBER := inmin;
     n_scale NUMBER := (inmax - n_min)/10; --Az intervallumot feloszjuk 10 részre, 10 vonalat fogunk rajzolni
     n_iterator NUMBER := n_min;
     n_y NUMBER;
